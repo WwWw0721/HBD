@@ -3,86 +3,597 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday! 專屬解謎</title>
+    <title>生日解謎</title>
     <style>
-        /* 網頁的視覺設計 */
         body { 
-            font-family: 'Helvetica Neue', Arial, sans-serif; 
-            background-color: #fff0f5; /* 柔和的粉紅色背景 */
+            font-family: sans-serif; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
             margin: 0; 
+            background-color: #FFF0F5; 
+            overflow: hidden; 
         }
-        .card { 
-            background: white; 
-            padding: 40px 30px; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+        .container { 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
             text-align: center; 
-            max-width: 400px; 
-            width: 85%; 
+            width: 300px; 
+            z-index: 10; 
+            position: relative;
+            max-height: 90vh; 
+            overflow-y: auto; 
         }
-        h2 { color: #333; }
-        p { color: #666; line-height: 1.5; }
+        .hidden { display: none !important; }
         input { 
-            padding: 12px; 
-            margin: 20px 0; 
-            border: 2px solid #ffb6c1; 
-            border-radius: 8px; 
             width: 80%; 
-            font-size: 16px;
+            padding: 10px; 
+            margin: 15px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
             outline: none;
         }
-        input:focus { border-color: #ff69b4; }
         button { 
-            background-color: #ff69b4; 
+            padding: 10px 20px; 
+            background-color: #ff99a8; 
             color: white; 
-            border: none; 
-            padding: 12px 25px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
             font-weight: bold;
-            transition: 0.3s;
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: 0.2s;
         }
-        button:hover { background-color: #ff1493; }
-        .hidden { display: none; }
-        .error { color: #ff0000; font-size: 14px; margin-top: 15px; font-weight: bold; }
+        button:hover { background-color: #ff778b; }
+        .quiz-img { 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+        }
+        .sticker {
+            position: fixed; 
+            z-index: 1;      
+            pointer-events: none; 
+        }
+        .error { 
+            color: red; 
+            font-size: 14px; 
+            display: none; 
+            margin-bottom: 10px; 
+        }
+        a {
+            color: #4a90e2; 
+            text-decoration: underline; 
+            font-weight: bold; 
+        }
+        a:hover {
+            color: #357abd; 
+        }
+
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .choice-btn {
+            width: 100%;
+            padding: 12px 5px;
+            font-size: 14px;
+        }
+        .clickable-img {
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent; 
+            transition: 0.2s; 
+            box-sizing: border-box;
+        }
+        .clickable-img:hover {
+            border-color: #ff99a8; 
+            transform: scale(1.05); 
+        }
+        audio {
+            width: 100%;
+            margin-bottom: 15px;
+            height: 40px;
+        }
+        video {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .food-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+            padding: 15px 10px;
+            background: #fffafa;
+            border: 2px dashed #ffb6c1;
+            border-radius: 8px;
+        }
+        .food-btn {
+            background-color: white;
+            color: #ff778b;
+            border: 1px solid #ff778b;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .food-btn:hover {
+            background-color: #ff99a8;
+            color: white;
+        }
+        .food-btn.wrong {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+        /* ======= 第 13 關：動態字海網格 ======= */
+        .grid-dynamic {
+            display: grid;
+            gap: 3px;
+            margin: 10px auto 15px auto;
+            justify-content: center;
+            width: 100%;
+            max-width: 280px; 
+        }
+        .word-btn {
+            background-color: white;
+            color: #ff778b;
+            border: 1px solid #ffb6c1;
+            border-radius: 4px;
+            padding: 6px 0;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .word-btn.selected {
+            background-color: #d81b60; 
+            color: white;
+            border-color: #d81b60;
+            transform: scale(0.95);
+        }
+        #timerDisplay {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d81b60;
+            margin: 10px 0;
+            background: #ffe0e5;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card" id="level1">
-        <h2>🧩 第一關：我們的起點</h2>
-        <p>還記得我們第一次約會去哪裡嗎？<br>（提示：兩個字）</p>
-        <input type="text" id="answer1" placeholder="輸入妳的答案...">
-        <br>
-        <button onclick="checkAnswer()">確認送出</button>
-        <p id="error-msg" class="hidden error">密碼錯誤，再想想看！</p>
+    <div id="level1" class="container">
+        <img src="1.png" class="sticker" style="bottom: 20px; left: 20px; width: 120px;">
+        <h2>交往紀念日</h2>
+        <input type="text" id="ans1" placeholder="-3-">
+        <div id="err1" class="error">哇操這都能錯</div>
+        <button onclick="check(1, '4/17')">快點按我</button>
+
+        <hr style="border: 0; border-top: 1px dashed #ff99a8; margin: 25px 0 15px 0;">
+        <p style="font-size: 12px; color: #888; margin: 0 0 5px 0;">🤫 快速通關</p>
+        <input type="text" id="speedpwd" placeholder="速通密碼" style="width: 50%; padding: 6px; margin: 5px 0;">
+        <button onclick="speedrun()" style="padding: 6px 12px; font-size: 12px; background-color: #ccc;">傳送</button>
     </div>
 
-    <div class="card hidden" id="success">
-        <h2>🎉 恭喜通關！</h2>
-        <p>寶貝生日快樂！這只是剛開始，接下來的驚喜藏在...</p>
+    <div id="level2" class="container hidden">
+        <img src="2.png" class="sticker" style="top: 30px; right: 30px; width: 180px;">
+        <h2>當天去的百貨公司</h2>
+        <input type="text" id="ans2" placeholder="想水餃了">
+        <div id="err2" class="error">補是</div>
+        <button onclick="check(2, '新光三越', '新光')">快點按我</button>
+    </div>
+
+    <div id="level3" class="container hidden">
+        <img src="3.png" class="sticker" style="bottom: 30px; right: 30px; width: 150px;">
+        <h2>這在哪邊拍的</h2>
+        <img src="photo1.jpg" alt="提示照片" class="quiz-img">
+        <input type="text" id="ans3" placeholder="嗷哇">
+        <div id="err3" class="error">補是 提示是我的灰衣</div>
+        <button onclick="check(3, '二中')">快點按我</button>
+    </div>
+
+    <div id="level4" class="container hidden">
+        <img src="1.png" class="sticker" style="top: 50px; left: 20px; width: 130px;">
+        <h2>這天幾月幾號</h2>
+        <img src="photo2.jpg" alt="提示照片" class="quiz-img">
+        <input type="text" id="ans4" placeholder="對">
+        <div id="err4" class="error">補是 這天跟steve出去</div>
+        <button onclick="check(4, '7/21')">快點按我</button>
+    </div>
+
+    <div id="level5" class="container hidden">
+        <img src="2.png" class="sticker" style="bottom: 20px; right: 40px; width: 140px;">
+        <h2>第一次草比日202X/XX/X</h2>
+        <input type="text" id="ans5" placeholder="真害羞">
+        <div id="err5" class="error">補是 小毛好像知道</div>
+        <button onclick="check(5, '2024/11/3')">快點草我</button>
+    </div>
+
+    <div id="level6" class="container hidden">
+        <img src="3.png" class="sticker" style="top: 20px; right: 20px; width: 150px;">
+        <h2>妳第幾名 真棒</h2>
+        <img src="photo3.jpg" alt="提示照片" class="quiz-img">
+        <input type="text" id="ans6" placeholder="不知道就亂猜ㄅ">
+        <div id="err6" class="error">
+            補是 <br>
+            <a href="https://www.worldcubeassociation.org/persons/2025TSEN16" target="_blank">這裡</a>
         </div>
+        <button onclick="check(6, '284')">快點按我</button>
+    </div>
+
+    <div id="level7" class="container hidden">
+        <img src="1.png" class="sticker" style="bottom: 40px; left: 30px; width: 130px;">
+        <h2>這是誰引退賽</h2>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <img src="photo7-1.jpg" alt="提示照片1" class="quiz-img" style="margin-bottom: 0; width: 50%;">
+            <img src="photo7-2.jpg" alt="提示照片2" class="quiz-img" style="margin-bottom: 0; width: 50%;">
+        </div>
+        
+        <div class="grid-2x2">
+            <button class="choice-btn" onclick="checkChoice(7, 'A', '胡銀龍')">胡銀龍</button>
+            <button class="choice-btn" onclick="checkChoice(7, '胡金龍', '胡金龍')">胡金龍</button>
+            <button class="choice-btn" onclick="checkChoice(7, 'C', '潘金龍')">潘金龍</button>
+            <button class="choice-btn" onclick="checkChoice(7, 'D', '潘銀龍')">潘銀龍</button>
+        </div>
+        <div id="err7" class="error">補是 看圖片</div>
+    </div>
+
+    <div id="level8" class="container hidden">
+        <img src="2.png" class="sticker" style="top: 40px; left: 20px; width: 160px;">
+        <h2>小貓</h2>
+        <audio controls src="88boy.mp3"></audio>
+        <div class="grid-2x2">
+            <img src="88boy.png" class="clickable-img" onclick="checkChoice(8, 'A', 'A')">
+            <img src="bnncat.png" class="clickable-img" onclick="checkChoice(8, 'B', 'A')">
+            <img src="fan.png" class="clickable-img" onclick="checkChoice(8, 'C', 'A')">
+            <img src="8giyazo.png" class="clickable-img" onclick="checkChoice(8, 'D', 'A')">
+        </div>
+        <div id="err8" class="error">補是</div>
+    </div>
+
+    <div id="level9" class="container hidden">
+        <img src="3.png" class="sticker" style="bottom: 30px; right: 20px; width: 150px;">
+        <h2>小狗</h2>
+        <audio controls src="dogdoing.mp3"></audio>
+        <div class="grid-2x2">
+            <img src="cry.png" class="clickable-img" onclick="checkChoice(9, 'A', 'C')">
+            <img src="boss.png" class="clickable-img" onclick="checkChoice(9, 'B', 'C')">
+            <img src="dogdoing.png" class="clickable-img" onclick="checkChoice(9, 'C', 'C')">
+            <img src="daswa.png" class="clickable-img" onclick="checkChoice(9, 'D', 'C')">
+        </div>
+        <div id="err9" class="error">補是</div>
+    </div>
+
+    <div id="level10" class="container hidden">
+        <img src="1.png" class="sticker" style="bottom: 20px; left: 40px; width: 160px;">
+        <h2>真好吃</h2>
+        
+        <video controls>
+            <source src="video10.mp4" type="video/mp4">
+            妳的瀏覽器不支援影片播放。
+        </video>
+        
+        <p style="font-size: 14px; margin: 0; color: #555;">肚餓</p>
+
+        <div class="food-grid">
+            <button class="food-btn" onclick="checkFood(this, '義式餐廳')">義式餐廳</button>
+            <button class="food-btn" onclick="checkFood(this, '法式料理')">法式料理</button>
+            <button class="food-btn" onclick="checkFood(this, '美式漢堡')">美式漢堡</button>
+            <button class="food-btn" onclick="checkFood(this, '麻辣火鍋')">麻辣火鍋</button>
+            <button class="food-btn" onclick="checkFood(this, '韓式烤肉')">韓式烤肉</button>
+            <button class="food-btn" onclick="checkFood(this, '泰式料理')">泰式料理</button>
+            <button class="food-btn" onclick="checkFood(this, '迴轉壽司')">迴轉壽司</button>
+            <button class="food-btn" onclick="checkFood(this, '港式飲茶')">港式飲茶</button>
+            <button class="food-btn" onclick="checkFood(this, '台式熱炒')">台式熱炒</button>
+            <button class="food-btn" onclick="checkFood(this, '鐵板燒')">鐵板燒</button>
+            
+            <button class="food-btn" onclick="checkFood(this, '日式餐酒館')">日式餐酒館</button>
+            
+            <button class="food-btn" onclick="checkFood(this, '印度咖哩')">印度咖哩</button>
+            <button class="food-btn" onclick="checkFood(this, '墨西哥餐廳')">墨西哥餐廳</button>
+            <button class="food-btn" onclick="checkFood(this, '居酒屋')">居酒屋</button>
+            <button class="food-btn" onclick="checkFood(this, '早午餐')">早午餐</button>
+            <button class="food-btn" onclick="checkFood(this, '牛排館')">牛排館</button>
+            <button class="food-btn" onclick="checkFood(this, '日式拉麵')">日式拉麵</button>
+            <button class="food-btn" onclick="checkFood(this, '壽喜燒')">壽喜燒</button>
+            <button class="food-btn" onclick="checkFood(this, '越式餐廳')">越式餐廳</button>
+            <button class="food-btn" onclick="checkFood(this, '日式串燒')">日式串燒</button>
+        </div>
+    </div>
+
+    <div id="success" class="container hidden">
+        <img src="4.png" class="sticker" style="top: 20px; right: 20px; width: 220px;">
+        <h2 style="font-size: 36px; color: #ff6b81; margin-bottom: 10px;">我要吃 飯!</h2>
+        <img src="fan.png" alt="通關照片" class="quiz-img">
+        <a href="https://maps.app.goo.gl/EN72YugKduk9e1Bd9?g_st=ic" target="_blank" style="font-size: 22px; background: #fff0f5; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px; border: 2px solid #ff99a8;">吃這個 🍽️</a>
+        <hr style="border: 0; border-top: 2px dashed #ff99a8; margin: 15px 0;">
+        <p style="font-size: 16px; font-weight: bold; color: #333;">生日真好<br></p>
+    </div>
+
+    <div id="level11" class="container hidden">
+        <img src="3.png" class="sticker" style="top: 30px; right: 30px; width: 150px;">
+        <h2>要去哪ㄦ</h2>
+        
+        <div id="hintsContainer11" style="margin-bottom: 10px;"></div>
+
+        <input type="text" id="ans11" placeholder="吃飽要幹嘛">
+        <div id="err11" class="error">補是 再猜猜看！</div>
+        
+        <button onclick="checkLevel11()">快點按我</button>
+    </div>
+
+    <div id="level12" class="container hidden">
+        <img src="1.png" class="sticker" style="bottom: 30px; left: 30px; width: 150px;">
+        <h2>答對ㄌ 🎬</h2>
+        
+        <video id="finalVideo" controls>
+            <source src="movie.mp4" type="video/mp4">
+            妳的瀏覽器不支援影片播放。
+        </video>
+        
+        <p style="font-size: 14px; margin: 10px 0 15px 0; color: #555;">看完影片後，點擊下方按鈕揭曉大獎！</p>
+        <button onclick="finishVideo12()">點我拿禮物</button>
+    </div>
+
+    <div id="level13" class="container hidden">
+        <img src="2.png" class="sticker" style="top: 20px; right: 30px; width: 130px;">
+        <h2 style="margin-bottom: 5px;">自己找禮物</h2>
+        <p style="font-size: 14px; margin: 0 0 5px 0; color: #555;">選4個字</p>
+        
+        <div id="timerDisplay">剩餘時間：30 秒</div>
+        
+        <div id="wordGrid13" class="grid-dynamic"></div>
+        
+        <div id="err13" class="error" style="font-weight: bold;">補對</div>
+        
+        <button onclick="checkLevel13()" style="margin-top: 5px; width: 100%;">送出答案</button>
+    </div>
+
+    <div id="final-success" class="container hidden">
+        <img src="4.png" class="sticker" style="top: 20px; right: 20px; width: 220px;">
+        
+        <h2 style="font-size: 32px; color: #ff6b81; margin-bottom: 10px;">可以拿禮物了 🎁</h2>
+        
+        <hr style="border: 0; border-top: 2px dashed #ff99a8; margin: 15px 0;">
+        
+        <p style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 25px;">生日快樂小包！<br></p>
+
+        <button onclick="showUltimateVideo()" style="width: 100%; font-size: 18px; padding: 12px; background-color: #d81b60;">寶寶生日我安排 🎉</button>
+    </div>
+
+    <div id="ultimate-video-page" class="container hidden">
+        <img src="1.png" class="sticker" style="top: 20px; left: 20px; width: 130px;">
+        
+        <video controls style="width: 100%; border-radius: 8px;">
+            <source src="birthday-video.mp4" type="video/mp4">
+            妳的瀏覽器不支援影片播放。
+        </video>
+        
+    </div>
 
     <script>
-        // 判斷答案的邏輯
-        function checkAnswer() {
-            const ans = document.getElementById('answer1').value.trim();
-            const errorMsg = document.getElementById('error-msg');
+        function check(currentLevel, answer1, answer2) {
+            let userInput = document.getElementById('ans' + currentLevel).value.trim();
+            let errorMsg = document.getElementById('err' + currentLevel);
             
-            // ★ 將這裡的 '淡水' 替換成你真正設定的答案 ★
-            if(ans === '淡水' || ans === 'tamsui') {
-                // 答案正確：隱藏第一關，顯示通關畫面
-                document.getElementById('level1').classList.add('hidden');
-                document.getElementById('success').classList.remove('hidden');
-                errorMsg.classList.add('hidden');
+            if (userInput === answer1 || (answer2 && userInput === answer2)) {
+                document.getElementById('level' + currentLevel).classList.add('hidden');
+                goToNext(currentLevel);
             } else {
-                // 答案錯誤：顯示錯誤訊息
-                errorMsg.classList.remove('hidden');
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function checkChoice(currentLevel, chosenAnswer, correctAnswer) {
+            let errorMsg = document.getElementById('err' + currentLevel);
+            
+            if (chosenAnswer === correctAnswer) {
+                let audio = document.querySelector('#level' + currentLevel + ' audio');
+                if(audio) audio.pause();
+
+                document.getElementById('level' + currentLevel).classList.add('hidden');
+                goToNext(currentLevel);
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function checkFood(btn, foodName) {
+            if (foodName === '日式餐酒館') {
+                let video = document.querySelector('#level10 video');
+                if(video) video.pause();
+
+                document.getElementById('level10').classList.add('hidden');
+                document.getElementById('success').classList.remove('hidden');
+            } else {
+                btn.classList.add('wrong');
+                btn.innerHTML = '❌'; 
+                btn.disabled = true; 
+            }
+        }
+
+        function goToNext(currentLevel) {
+            let nextLevel = currentLevel + 1;
+            let nextDiv = document.getElementById('level' + nextLevel);
+            if (nextDiv) {
+                nextDiv.classList.remove('hidden');
+            }
+        }
+
+        // 第 11 關專屬提示邏輯
+        let wrongCount11 = 0;
+        const hints11 = [
+            "💡 提示 1：3 個字",
+            "💡 提示 2：黃色",
+            "💡 提示 3：南紡",
+            "💡 提示 4：5 樓"
+        ];
+
+        function checkLevel11() {
+            let userInput = document.getElementById('ans11').value.trim();
+            let errorMsg = document.getElementById('err11');
+            let hintsContainer = document.getElementById('hintsContainer11');
+
+            if (userInput === '看電影') {
+                document.getElementById('level11').classList.add('hidden');
+                document.getElementById('level12').classList.remove('hidden');
+            } else {
+                errorMsg.style.display = 'block';
+                
+                if (wrongCount11 < hints11.length) {
+                    let p = document.createElement('p');
+                    p.style.fontSize = '14px';
+                    p.style.color = '#d81b60'; 
+                    p.style.margin = '5px 0';
+                    p.style.fontWeight = 'bold';
+                    p.innerText = hints11[wrongCount11];
+                    
+                    hintsContainer.appendChild(p);
+                    wrongCount11++; 
+                }
+            }
+        }
+
+        // 結束第12關影片並進入字海遊戲
+        function finishVideo12() {
+            let fv = document.getElementById('finalVideo');
+            if(fv) fv.pause();
+            
+            document.getElementById('level12').classList.add('hidden');
+            document.getElementById('level13').classList.remove('hidden');
+            initGrid13(); // 觸發 13 關遊戲與倒數
+        }
+
+        // ======= 第 13 關：動態字海與倒數計時系統 =======
+        const targetWords = ["線", "條", "小", "狗"];
+        let currentGridSize = 10;
+        let timerInterval = null;
+        let timeLeft = 30;
+
+        const massivePool = "的一是在有了我不和大這主中人上為們地個用工時要動國產以我到他會作來分生對於學下級就年階義發成部民可出能方進同行面說種過命度革而多子後自社加但結果其些只經理物起宏白美可愛貓星月花草水火天明日金木土心情理法政事當你看想起寫把從又道老長如問正重體實氣文電風體然問者本只特打道機全最公立表解山更先管期導建交區認展保各原強立題向論資信統受傳治報清空達變步則路叫流記飛鳥魚蟲春夏秋冬南北東西上下左右男女老少前後內外大小多少高低長短粗細胖瘦輕重黑白紅白黃綠藍紫粉灰棕金銀銅鐵錫鉛玉石泥沙海洋川河江湖池井波浪潮汐冰雪霜雨雲霧雷電暴颱風颶風微狂和寒熱暖涼明暗昏晨午晚夜深破曉晴陰雨雪霞虹暈輝彩澤斑斕繽紛鮮艷淡單調潔純乳蒼亮透";
+
+        function initGrid13() {
+            const container = document.getElementById('wordGrid13');
+            container.innerHTML = ''; 
+            container.style.gridTemplateColumns = `repeat(${currentGridSize}, 1fr)`;
+
+            let chars = [...targetWords];
+            let totalCells = currentGridSize * currentGridSize;
+
+            while (chars.length < totalCells) {
+                let randomChar = massivePool.charAt(Math.floor(Math.random() * massivePool.length));
+                if (!targetWords.includes(randomChar)) {
+                    chars.push(randomChar);
+                }
+            }
+            
+            chars.sort(() => Math.random() - 0.5);
+            
+            chars.forEach(char => {
+                let btn = document.createElement('div');
+                btn.className = 'word-btn';
+                btn.innerText = char;
+                if(currentGridSize <= 6) btn.style.padding = "10px 0";
+                
+                btn.onclick = function() {
+                    this.classList.toggle('selected');
+                };
+                container.appendChild(btn);
+            });
+
+            startTimer13();
+        }
+
+        function startTimer13() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            document.getElementById('timerDisplay').innerText = `剩餘時間：${timeLeft} 秒`;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timerDisplay').innerText = `剩餘時間：${timeLeft} 秒`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    
+                    if (currentGridSize > 5) {
+                        currentGridSize--;
+                    }
+                    
+                    let errNode = document.getElementById('err13');
+                    errNode.style.display = 'block';
+                    errNode.innerText = `時間到！`;
+                    errNode.style.color = '#d81b60'; 
+                    
+                    setTimeout(()=> {
+                        errNode.style.display = 'none';
+                        errNode.style.color = 'red'; 
+                        errNode.innerText = '補對';
+                    }, 2000);
+
+                    initGrid13(); 
+                }
+            }, 1000);
+        }
+
+        function checkLevel13() {
+            let selectedBtns = document.querySelectorAll('#wordGrid13 .word-btn.selected');
+            let errorMsg = document.getElementById('err13');
+            
+            let selectedChars = Array.from(selectedBtns).map(btn => btn.innerText);
+
+            if (selectedChars.length === 4 && 
+                selectedChars.includes("線") && 
+                selectedChars.includes("條") && 
+                selectedChars.includes("小") && 
+                selectedChars.includes("狗")) {
+                
+                clearInterval(timerInterval);
+                document.getElementById('level13').classList.add('hidden');
+                document.getElementById('final-success').classList.remove('hidden');
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // 🌟 新增：跳轉到最後一支影片 🌟
+        function showUltimateVideo() {
+            document.getElementById('final-success').classList.add('hidden');
+            document.getElementById('ultimate-video-page').classList.remove('hidden');
+        }
+
+        // ======= 雙密碼速通功能 =======
+        function speedrun() {
+            let pwd = document.getElementById('speedpwd').value.trim();
+            if (pwd === '06131306') {
+                document.getElementById('level1').classList.add('hidden');
+                document.getElementById('level11').classList.remove('hidden');
+            } else if (pwd === '07212107') {
+                document.getElementById('level1').classList.add('hidden');
+                document.getElementById('level13').classList.remove('hidden');
+                initGrid13(); // 觸發字海與計時
+            } else {
+                alert('補對 真壞');
             }
         }
     </script>

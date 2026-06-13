@@ -309,7 +309,9 @@
             <button class="food-btn" onclick="checkFood(this, '印度咖哩')">印度咖哩</button>
             <button class="food-btn" onclick="checkFood(this, '墨西哥餐廳')">墨西哥餐廳</button>
             <button class="food-btn" onclick="checkFood(this, '居酒屋')">居酒屋</button>
-            <button class="food-btn" onclick="checkFood(this, '早午餐')">早午餐</button>
+            
+            <button class="food-btn" onclick="checkFood(this, '夜市')">夜市</button>
+            
             <button class="food-btn" onclick="checkFood(this, '牛排館')">牛排館</button>
             <button class="food-btn" onclick="checkFood(this, '日式拉麵')">日式拉麵</button>
             <button class="food-btn" onclick="checkFood(this, '壽喜燒')">壽喜燒</button>
@@ -319,7 +321,7 @@
     </div>
 
     <div id="success" class="container hidden">
-        <img src="4.png" class="sticker" style="top: 20px; right: 20px; width: 220px;">
+        <img src="dogduck.png" class="sticker" style="top: 20px; right: 20px; width: 220px;">
         <h2 style="font-size: 36px; color: #ff6b81; margin-bottom: 10px;">我要吃 飯!</h2>
         <img src="fan.png" alt="通關照片" class="quiz-img">
         <a href="https://maps.app.goo.gl/EN72YugKduk9e1Bd9?g_st=ic" target="_blank" style="font-size: 22px; background: #fff0f5; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-bottom: 20px; border: 2px solid #ff99a8;">吃這個 🍽️</a>
@@ -340,7 +342,7 @@
     </div>
 
     <div id="level12" class="container hidden">
-        <img src="1.png" class="sticker" style="bottom: 30px; left: 30px; width: 150px;">
+        <img src="dogshoe.png" class="sticker" style="bottom: 30px; left: 30px; width: 150px;">
         <h2>答對ㄌ 🎬</h2>
         
         <video id="finalVideo" controls>
@@ -350,7 +352,7 @@
     </div>
 
     <div id="level13" class="container hidden">
-        <img src="2.png" class="sticker" style="top: 20px; right: 30px; width: 130px;">
+        <img src="cat.png" class="sticker" style="top: 20px; right: 30px; width: 130px;">
         <h2 style="margin-bottom: 5px;">自己找禮物</h2>
         <p style="font-size: 14px; margin: 0 0 5px 0; color: #555;">選4個字</p>
         
@@ -364,7 +366,7 @@
     </div>
 
     <div id="final-success" class="container hidden">
-        <img src="4.png" class="sticker" style="top: 20px; right: 20px; width: 220px;">
+        <img src="owa.png" class="sticker" style="top: 20px; right: 20px; width: 220px;">
         
         <h2 style="font-size: 32px; color: #ff6b81; margin-bottom: 10px;">可以拿禮物了 🎁</h2>
         
@@ -378,8 +380,10 @@
     <div id="ultimate-video-page" class="container hidden">
         <img src="1.png" class="sticker" style="top: 20px; left: 20px; width: 130px;">
         
+        <h2 style="color: #ff6b81; font-size: 24px; margin-bottom: 15px;">買小花和買小狗</h2>
+        
         <video controls style="width: 100%; border-radius: 8px;">
-            <source src="birthday-video.mp4" type="video/mp4">
+            <source src="Fv.mp4" type="video/mp4">
             妳的瀏覽器不支援影片播放。
         </video>
         
@@ -570,13 +574,11 @@
             }
         }
 
-        // 🌟 新增：跳轉到最後一支影片 🌟
         function showUltimateVideo() {
             document.getElementById('final-success').classList.add('hidden');
             document.getElementById('ultimate-video-page').classList.remove('hidden');
         }
 
-        // ======= 雙密碼速通功能 =======
         function speedrun() {
             let pwd = document.getElementById('speedpwd').value.trim();
             if (pwd === '06131306') {
@@ -585,7 +587,7 @@
             } else if (pwd === '07212107') {
                 document.getElementById('level1').classList.add('hidden');
                 document.getElementById('level13').classList.remove('hidden');
-                initGrid13(); // 觸發字海與計時
+                initGrid13(); 
             } else {
                 alert('補對 真壞');
             }
